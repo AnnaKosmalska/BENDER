@@ -8,7 +8,7 @@ int clk = 0;
 int pwmResolution = 10;
 int shiftBits[] = {1,2,4,8,16,32,64,128};
 int motorCommands[4]; // left - right - bleft - bright
-int timerTime = 300; //microsec
+int timerTime = 2000; //microsec
 int maxSpeed = 10;
 
 #define LEFT 160
@@ -19,25 +19,38 @@ int maxSpeed = 10;
 
 
 void pwmTimerF() {
-  
+  Serial.println(motorCommands[0]);
   clk++;
   if(clk > pwmResolution) clk =  0;
   int v = map(clk, 0, pwmResolution, 0, maxSpeed);
-  Serial.println(motorCommands[1]);
+  
   int shiftValues = 0;
   for(int i=0; i<4; ++i) {
     if(v < motorCommands[i]) {
-      if(i==0) shiftValues += LEFT;
-      else if(i==1) shiftValues += RIGHT;
-      else if(i==2) shiftValues += B_LEFT;
-      else if(i==3) shiftValues += B_RIGHT;
+      if(i==0) {
+        shiftValues += LEFT;
+        Serial.println("left");
+      }
+      else if(i==1) {
+        shiftValues += RIGHT;
+        Serial.println("right");
+      }
+      else if(i==2) {
+        shiftValues += B_LEFT;
+        Serial.println("b left");
+      }
+      else if(i==3) {
+        shiftValues += B_RIGHT;
+        Serial.println("b right");
+      }
       }
     }
   
   
   digitalWrite(latchPin, LOW);
   shiftOut(dataPin, clockPin, MSBFIRST, shiftValues);
-  digitalWrite(latchPin, LOW);
+  
+  digitalWrite(latchPin, HIGH);
   }
 
 void setup() {
@@ -55,7 +68,7 @@ void setup() {
   Serial.begin(9600);
 }
 
-void forward(int speed_val) {
+/*void forward(int speed_val) {
   motorCommands[0] = speed_val;
   motorCommands[1] = speed_val;
   motorCommands[2] = 0;
@@ -74,10 +87,10 @@ void stop_all() {
   motorCommands[1] = 0;
   motorCommands[2] = 0;
   motorCommands[3] = 0;
-  }
+  }*/
 
 void loop() {
-
+  Serial.println("            LOOOOOOOOOP          ");
   /*for(int s=0; s<maxSpeed; ++s) {
     forward(s);
     delay(100);
@@ -99,12 +112,18 @@ void loop() {
     delay(100);
     }
   delay(1000);*/
-  forward(maxSpeed/2);  
+  motorCommands[0] = 10;
+  motorCommands[1] = 10;
+  motorCommands[2] = 0;
+  motorCommands[3] = 0;  
   delay(1000);
-  /*stop_all();
+  motorCommands[0] = 7;
+  motorCommands[1] = 0;
+  motorCommands[2] = 0;
+  motorCommands[3] = 0;
+  delay(1000);
+  /*backwards(maxSpeed/2);
   delay(1000);*/
-  backwards(maxSpeed/2);
-  delay(1000);
   /*stop_all();
   delay(1000);*/
 }
